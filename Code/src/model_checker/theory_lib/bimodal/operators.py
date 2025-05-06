@@ -22,6 +22,8 @@ Modal Operators:
 Temporal Operators:
     - FutureOperator (⏵): Truth at all future times
     - PastOperator (⏴): Truth at all past times
+    - NextOperator: Truth at the "next" time in a history 
+    - PreviousOperator: Truth at the "previous" time in a history 
     - DefFutureOperator: Possibility of future truth (defined)
     - DefPastOperator: Possibility of past truth (defined)
 
@@ -818,7 +820,303 @@ class PastOperator(syntactic.Operator):
         eval_world_times = eval_world_history.keys()
         self.print_over_times(sentence_obj, eval_point, eval_world_times, indent_num, use_colors)
 
+class NextOperator(syntactic.Operator):
+    """Temporal operator that evaluates whether an argument holds at the "next" time in a history. 
 
+    This operator implements the "Next it will be the case that..." It evaluates
+    whether its argument is true at the "next" time in a history. 
+
+    Key Properties:
+        - Evaluates the truth value of a formula and the successive time in a history.
+        --Returns true if the formula is true at the next time. 
+        --Returns false if the formula is false at the next time. 
+        - Vacuously true if there is no "next" time. 
+        - Only considers times within the valid interval for the current world
+
+    Methods:
+        true_at: Returns true if argument holds at the next time
+        false_at: Returns true if argument fails at the next time
+        find_truth_condition: Computes temporal profiles for all worlds
+        print_method: Displays evaluation across different time points
+
+    Example:
+        If p means "it's raining", then ∘p means "it will rain at the next time"
+        . More colloquially, it might mean "it will rain tomorrow." 
+    """
+
+    name = "\\Next"
+    arity = 1
+
+    def true_at(self, argument, eval_world, eval_time):
+        """Returns true if argument is true at the time of evaluation plus one. 
+        
+        Args:
+            argument: The argument to apply the next operator to
+            eval_world: The world ID for evaluation context
+            eval_time: The time for evaluation context
+        """
+        semantics = self.semantics
+        time = z3.Int('next_true_time')
+    
+        #define "next time" variable
+        next_time = eval_time + 1
+
+        return z3.And(
+                
+            #Time is within the valid range for this world's interval
+            semantics.is_valid_time_for_world(eval_world, next_time),
+
+            #Formula is true at next time in world 
+            semantics.true_at(argument, eval_world, next_time)
+            )
+        
+
+    def false_at(self, argument, eval_world, eval_time):
+        """Returns true if argument is false at the "next" time in the world's time interval. 
+        
+        Args:
+            argument: The argument to apply the next operator to
+            eval_world: The world ID for evaluation context
+            eval_time: The time for evaluation context
+        """
+        semantics = self.semantics
+        time = z3.Int('next_false_time')
+        next_time = eval_time + 1
+
+        return z3.And(
+                # Time is within the valid range for this world's interval
+                semantics.is_valid_time_for_world(eval_world, next_time),
+
+                #Formula is false at the next time in world 
+                semantics.false_at(argument, eval_world, next_time),
+            )
+    
+    def find_truth_condition(self, argument, eval_world, eval_time):
+        """Gets truth-condition for 'Next it will be the case that'.
+        
+        Args:
+            argument: The argument to apply the next operator to
+            eval_world: The world ID for evaluation context
+            eval_time: The time for evaluation context
+            
+        Returns:
+            dict: A dictionary mapping world_ids to (true_times, false_times) pairs,
+                 where a time is in the true_times if the argument is true in all
+                 past times and the time is in the false_times otherwise
+                 
+        Raises:
+            KeyError: If world_time_intervals information is missing for a world_id.
+                     This follows the fail-fast philosophy to make errors explicit.
+        """
+        model_structure = argument.proposition.model_structure
+        semantics = model_structure.semantics
+        argument_extension = argument.proposition.extension
+        truth_condition = {}
+        
+        # For any current_world with a temporal_profile of true and false times
+        for current_world, temporal_profile in argument_extension.items():
+            true_times, false_times = temporal_profile
+            
+            # Start with empty lists for past/future times
+            new_true_times, new_false_times = [], []
+            
+            # Find the time_interval for the current_world
+            start_time, end_time = semantics.world_time_intervals[current_world]
+            time_interval = list(range(start_time, end_time + 1))
+            
+            # Calculate which times the argument always has been true
+            for time_point in time_interval:
+
+                # Check if there are any world_times strictly after this time_point
+                has_future_times = any(any_time > time_point for any_time in time_interval)
+                
+                # If there are no future times in this world's interval, the Next operator is vacuously true
+                if not has_future_times:
+                    new_true_times.append(time_point)
+                    continue
+                    
+                # Find the next time from each time point 
+                next_false_times=[
+                    any_time
+                    for any_time in false_times 
+                    if any_time==(time_point + 1)
+                    and any_time in time_interval 
+                ]
+
+                # If the argument is not false at the next time, consider it true now 
+                if not next_false_times:
+                    # Add time_point to the new_true_times
+                    new_true_times.append(time_point)
+                else:
+                    # Otherwise add time_point to the new_false_times
+                    new_false_times.append(time_point)
+            
+            # Store the results for this world_id
+            truth_condition[current_world] = (new_true_times, new_false_times)
+
+        # Return result dictionary
+        return truth_condition
+    
+    def print_method(self, sentence_obj, eval_point, indent_num, use_colors):
+        """Print the sentence over all time points.
+        
+        Args:
+            sentence_obj: The sentence to print
+            eval_point: The evaluation point (world ID and time)
+            indent_num: The indentation level
+            use_colors: Whether to use colors in output
+        """
+        all_times = sentence_obj.proposition.model_structure.all_times
+        self.print_over_times(sentence_obj, eval_point, all_times, indent_num, use_colors)
+
+class PreviousOperator(syntactic.Operator):
+    """Temporal operator that evaluates whether an argument holds at the "previous" time in a history. 
+
+    This operator implements the "Previously it was the case that.." It evaluates
+    whether its argument is true at the "next" time in a history. 
+
+    Key Properties:
+        - Evaluates the truth value of a formula and the previous time in a history.
+        --Returns true if the formula is true at the previous time. 
+        --Returns false if the formula is false at the previous time. 
+        - Vacuously true if there is no "previous" time. 
+        - Only considers times within the valid interval for the current world
+
+    Methods:
+        true_at: Returns true if argument holds at the previous time
+        false_at: Returns true if argument fails at the previous time
+        find_truth_condition: Computes temporal profiles for all worlds
+        print_method: Displays evaluation across different time points
+
+    Example:
+        If p means "it's raining", then ∘p means "it will rain at the next time"
+        . More colloquially, it might mean "it will rain tomorrow." 
+    """
+
+    name = "\\Previous"
+    arity = 1
+
+    def true_at(self, argument, eval_world, eval_time):
+        """Returns true if argument is true at the time of evaluation plus one. 
+        
+        Args:
+            argument: The argument to apply the next operator to
+            eval_world: The world ID for evaluation context
+            eval_time: The time for evaluation context
+        """
+        semantics = self.semantics
+        time = z3.Int('previous_true_time')
+    
+        #define "previous time" variable
+        previous_time = eval_time - 1
+
+        return z3.And(
+                
+            #Time is within the valid range for this world's interval
+            semantics.is_valid_time_for_world(eval_world, previous_time),
+
+            #Formula is true at previous time in world 
+            semantics.true_at(argument, eval_world, previous_time)
+            )
+        
+
+    def false_at(self, argument, eval_world, eval_time):
+        """Returns true if argument is false at the "next" time in the world's time interval. 
+        
+        Args:
+            argument: The argument to apply the next operator to
+            eval_world: The world ID for evaluation context
+            eval_time: The time for evaluation context
+        """
+        semantics = self.semantics
+        time = z3.Int('previous_false_time')
+        previous_time = eval_time - 1
+
+        return z3.And(
+                # Time is within the valid range for this world's interval
+                semantics.is_valid_time_for_world(eval_world, previous_time),
+
+                #Formula is false at the previous time in world 
+                semantics.false_at(argument, eval_world, previous_time),
+            )
+    
+    def find_truth_condition(self, argument, eval_world, eval_time):
+        """Gets truth-condition for 'Previously it was the case that'.
+        
+        Args:
+            argument: The argument to apply the previous operator to
+            eval_world: The world ID for evaluation context
+            eval_time: The time for evaluation context
+            
+        Returns:
+            dict: A dictionary mapping world_ids to (true_times, false_times) pairs,
+                 where a time is in the true_times if the argument is true in all
+                 past times and the time is in the false_times otherwise
+                 
+        Raises:
+            KeyError: If world_time_intervals information is missing for a world_id.
+                     This follows the fail-fast philosophy to make errors explicit.
+        """
+        model_structure = argument.proposition.model_structure
+        semantics = model_structure.semantics
+        argument_extension = argument.proposition.extension
+        truth_condition = {}
+        
+        # For any current_world with a temporal_profile of true and false times
+        for current_world, temporal_profile in argument_extension.items():
+            true_times, false_times = temporal_profile
+            
+            # Start with empty lists for past/future times
+            new_true_times, new_false_times = [], []
+            
+            # Find the time_interval for the current_world
+            start_time, end_time = semantics.world_time_intervals[current_world]
+            time_interval = list(range(start_time, end_time + 1))
+            
+            # Calculate which times the argument always has been true
+            for time_point in time_interval:
+
+                # Check if there are any world_times strictly before this time_point
+                has_past_times = any(any_time < time_point for any_time in time_interval)
+                
+                # If there are no past times in this world's interval, the Previous operator is vacuously true
+                if not has_past_times:
+                    new_true_times.append(time_point)
+                    continue
+                    
+                # Find the next time from each time point 
+                previous_false_times=[
+                    any_time
+                    for any_time in false_times 
+                    if any_time==(time_point -1)
+                    and any_time in time_interval 
+                ]
+
+                # If the argument is not false at the previous time, consider it true now 
+                if not previous_false_times:
+                    # Add time_point to the new_true_times
+                    new_true_times.append(time_point)
+                else:
+                    # Otherwise add time_point to the new_false_times
+                    new_false_times.append(time_point)
+            
+            # Store the results for this world_id
+            truth_condition[current_world] = (new_true_times, new_false_times)
+
+        # Return result dictionary
+        return truth_condition
+    
+    def print_method(self, sentence_obj, eval_point, indent_num, use_colors):
+        """Print the sentence over all time points.
+        
+        Args:
+            sentence_obj: The sentence to print
+            eval_point: The evaluation point (world ID and time)
+            indent_num: The indentation level
+            use_colors: Whether to use colors in output
+        """
+        all_times = sentence_obj.proposition.model_structure.all_times
+        self.print_over_times(sentence_obj, eval_point, all_times, indent_num, use_colors)
 
 
 
@@ -1044,6 +1342,8 @@ bimodal_operators = syntactic.OperatorCollection(
     # tense operators
     FutureOperator,
     PastOperator,
+    NextOperator, 
+    PreviousOperator, 
 
     # defined operators
     ConditionalOperator,
