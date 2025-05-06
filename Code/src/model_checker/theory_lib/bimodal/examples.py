@@ -472,6 +472,42 @@ TN_TH_2_example = [
     TN_TH_2_settings,
 ]
 
+#TN_TH_3: (always) Future entails next 
+TN_TH_3_premises=['\\Future A']
+TN_TH_3_conclusions=['\\Next A']
+TN_TH_3_settings = {
+    'N' : 2,
+    'M' : 2,
+    'contingent' : False,
+    'disjoint' : False,
+    'max_time' : 2,
+    'expectation' : False,
+}
+TN_TH_3_example = [
+    TN_TH_3_premises,
+    TN_TH_3_conclusions,
+    TN_TH_3_settings,
+]
+
+
+#TN_TH_4: (always) Past entails previous
+TN_TH_4_premises=['\\Past A']
+TN_TH_4_conclusions=['\\Previous A']
+TN_TH_4_settings = {
+    'N' : 2,
+    'M' : 2,
+    'contingent' : False,
+    'disjoint' : False,
+    'max_time' : 2,
+    'expectation' : False,
+}
+TN_TH_4_example = [
+    TN_TH_4_premises,
+    TN_TH_4_conclusions,
+    TN_TH_4_settings,
+]
+
+
 
 
 ########################
@@ -612,6 +648,8 @@ test_example_range = {
 
     # Tense Theorems
     "TN_TH_2" : TN_TH_2_example,
+    "TN_TH_3" : TN_TH_3_example, 
+    "TN_TH_4" : TN_TH_4_example, 
 
     # Bimodal Theorems
     "BM_TH_1" : BM_TH_1_example,
@@ -643,8 +681,8 @@ example_range = {
     # Bimodal Countermodel
     # "BM_CM_1" : BM_CM_1_example,
     # "BM_CM_2" : BM_CM_2_example,
-    "BM_CM_3" : BM_CM_3_example,
-    "BM_CM_4" : BM_CM_4_example,
+    #"BM_CM_3" : BM_CM_3_example,
+    #"BM_CM_4" : BM_CM_4_example,
 
     ### THEOREMS ###
 
@@ -657,6 +695,8 @@ example_range = {
 
     # Tense Theorems
     # "TN_TH_2" : TN_TH_2_example,
+     "TN_TH_3" : TN_TH_3_example, 
+     "TN_TH_4" : TN_TH_4_example, 
 
     # Bimodal Theorems
     # "BM_TH_1" : BM_TH_1_example,
