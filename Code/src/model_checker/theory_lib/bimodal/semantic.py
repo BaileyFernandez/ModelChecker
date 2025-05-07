@@ -1359,7 +1359,7 @@ class BimodalProposition(PropositionDefaults):
                     # Pass the world_id directly to the true_at method
                     # Allow Z3 exceptions to propagate naturally - fail fast
                     truth_expr = self.model_structure.semantics.true_at(
-                        self.sentence, world_id, time
+                        self.sentence, {"world" : world_id, "time" : time}
                     )
                     evaluated_expr = self.z3_model.evaluate(truth_expr)
                     if z3.is_true(evaluated_expr):
@@ -1374,8 +1374,9 @@ class BimodalProposition(PropositionDefaults):
             
         elif self.operator is not None:
             # For complex sentences, delegate to the operator's find_truth_condition method
-            # Consistently use world ID
-            return self.operator.find_truth_condition(*arguments, self.eval_world, self.eval_time)
+            # Create an eval_point dictionary to pass world and time consistently
+            eval_point = {"world": self.eval_world, "time": self.eval_time}
+            return self.operator.find_truth_condition(*arguments, eval_point)
             
         raise ValueError(f"There is no proposition for {self}.")
 
