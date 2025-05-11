@@ -92,6 +92,7 @@ More information can be found in the README.md for the bimodal theory.
 import sys
 import os
 
+
 # Add current directory to path before importing modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
@@ -472,9 +473,9 @@ TN_TH_2_example = [
     TN_TH_2_settings,
 ]
 
-#TN_TH_3: (always) Future entails next 
-TN_TH_3_premises=['\\Future A']
-TN_TH_3_conclusions=['\\Next A']
+#TN_TH_3: Next entails (sometimes) future
+TN_TH_3_premises=['\\Next A']
+TN_TH_3_conclusions=['\\future A']
 TN_TH_3_settings = {
     'N' : 2,
     'M' : 2,
@@ -490,9 +491,9 @@ TN_TH_3_example = [
 ]
 
 
-#TN_TH_4: (always) Past entails previous
-TN_TH_4_premises=['\\Past A']
-TN_TH_4_conclusions=['\\Previous A']
+#TN_TH_4: Previous entails (sometimes) past
+TN_TH_4_premises=['\\Previous A']
+TN_TH_4_conclusions=['\\past A']
 TN_TH_4_settings = {
     'N' : 2,
     'M' : 2,
@@ -694,12 +695,13 @@ example_range = {
     # "MD_TH_2" : MD_TH_2_example,
 
     # Tense Theorems
+    # "TN_TH_1" : TN_TH_1_example, 
     # "TN_TH_2" : TN_TH_2_example,
      "TN_TH_3" : TN_TH_3_example, 
      "TN_TH_4" : TN_TH_4_example, 
 
     # Bimodal Theorems
-    # "BM_TH_1" : BM_TH_1_example,
+    #"BM_TH_1" : BM_TH_1_example,
     # "BM_TH_2" : BM_TH_2_example,
     # "BM_TH_3" : BM_TH_3_example,
     # "BM_TH_4" : BM_TH_4_example,
