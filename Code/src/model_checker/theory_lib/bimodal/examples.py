@@ -508,6 +508,40 @@ TN_TH_4_example = [
     TN_TH_4_settings,
 ]
 
+#TN_TH_5: A Until B, Next(Not A) entails Next(B)
+TN_TH_5_premises=['\\A \\Until B', '\\Next \\Neg A']
+TN_TH_5_conclusions=['\\Next B']
+TN_TH_5_settings = {
+    'N' : 2,
+    'M' : 6,
+    'contingent' : False,
+    'disjoint' : False,
+    'max_time' : 5,
+    'expectation' : False,
+}
+TN_TH_5_example = [
+    TN_TH_5_premises,
+    TN_TH_5_conclusions,
+    TN_TH_5_settings,
+]
+
+#TN_TH_6: A Since B, Previous(Not A) entails Previous (B) 
+TN_TH_6_premises=['\\A \\Since B', '\\Previous \\Neg A']
+TN_TH_6_conclusions=['\\Previous B']
+TN_TH_6_settings = {
+    'N' : 2,
+    'M' : 6,
+    'contingent' : False,
+    'disjoint' : False,
+    'max_time' : 5,
+    'expectation' : False,
+}
+TN_TH_6_example = [
+    TN_TH_6_premises,
+    TN_TH_6_conclusions,
+    TN_TH_6_settings,
+]
+
 
 
 
@@ -651,6 +685,8 @@ test_example_range = {
     "TN_TH_2" : TN_TH_2_example,
     "TN_TH_3" : TN_TH_3_example, 
     "TN_TH_4" : TN_TH_4_example, 
+    "TN_TH_5" : TN_TH_5_example, 
+    "TN_TH_6" : TN_TH_6_example, 
 
     # Bimodal Theorems
     "BM_TH_1" : BM_TH_1_example,
@@ -697,8 +733,10 @@ example_range = {
     # Tense Theorems
     # "TN_TH_1" : TN_TH_1_example, 
     # "TN_TH_2" : TN_TH_2_example,
-     "TN_TH_3" : TN_TH_3_example, 
-     "TN_TH_4" : TN_TH_4_example, 
+    "TN_TH_3" : TN_TH_3_example, 
+    "TN_TH_4" : TN_TH_4_example, 
+    "TN_TH_5" : TN_TH_5_example, 
+    "TN_TH_6" : TN_TH_6_example, 
 
     # Bimodal Theorems
     #"BM_TH_1" : BM_TH_1_example,

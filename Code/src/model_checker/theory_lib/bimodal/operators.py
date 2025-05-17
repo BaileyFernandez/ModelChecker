@@ -24,6 +24,10 @@ Temporal Operators:
     - PastOperator (⏴): Truth at all past times
     - NextOperator: Truth at the "next" time in a history 
     - PreviousOperator: Truth at the "previous" time in a history 
+    --Until 
+    --Since
+    --PreProg
+    --Pastprog
     - DefFutureOperator: Possibility of future truth (defined)
     - DefPastOperator: Possibility of past truth (defined)
 
