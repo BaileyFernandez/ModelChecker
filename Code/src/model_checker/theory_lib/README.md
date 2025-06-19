@@ -1,8 +1,9 @@
-# ModelChecker Theory Library
+# TheoryLib
 
 ## Overview
 
-The ModelChecker Theory Library is a collection of semantic theories implemented using Z3. Each theory provides a programmatic implementation of a different semantic framework, enabling automated verification of logical arguments and discovery of countermodels.
+The `TheoryLib` includes a collection of programmatic semantic theories implemented using Z3.
+Each theory enables automated verification of the validity of logical arguments as well as the discovery of countermodels.
 
 The library follows a modular architecture that allows:
 
@@ -13,24 +14,26 @@ The library follows a modular architecture that allows:
 
 ## Available Theories
 
-For a detailed overview of the standard architecture that each theory follows, see [THEORY_ARCHITECTURE.md](THEORY_ARCHITECTURE.md).
+For a detailed overview of the standard architecture that each theory follows, see [THEORY_ARCHITECTURE.md](../../../docs/THEORY_ARCHITECTURE.md).
 The library currently includes the following theories:
 
-### Default Theory (Hyperintensional Semantics)
+### _Logos_
+
+The _Logos_ provides a unified hyperintensional semantic theory.
 
 - **Theory Author**: Benjamin Brast-McKie
-- **Implementation Authors**: Benjamin Brast-McKie and Miguel Buitrago
+- **Contributors**: Benjamin Brast-McKie and Miguel Buitrago
 - **Description**: Implements a hyperintensional semantics for counterfactuals, constitutive operators, and modal logic.
 - **Key Papers**:
   - Brast-McKie (2021) "Identity and Aboutness", Journal of Philosophical Logic
   - Brast-McKie (2025) "Counterfactual Worlds", Journal of Philosophical Logic
 - **Key Features**:
-  - State-based hyperintensional propositions with verifiers and falsifiers
+  - Hyperintensional bilateral propositions
   - Truthmaker semantics for extensional connectives
-  - Counterfactual conditionals via alternatives
-  - Constitutive operators for essence, ground, and identity
+  - Counterfactual conditionals via alternative world-states
+  - Constitutive operators for essence, ground, and propositional identity
 
-More information abut the default theory can be found in [default/README.md](default/README.md).
+More information about the _Logos_ can be found in [logos/README.md](logos/README.md).
 
 ### Exclusion Theory
 
@@ -64,11 +67,8 @@ More information abut the imposition theory can be found in [imposition/README.m
 
 - **Theory Author**: Benjamin Brast-McKie
 - **Implementation Author**: Benjamin Brast-McKie
-- **Description**: Extends default theory with temporal modal operators.
-- **Key Features**:
-  - Both counterfactual and temporal modalities
-  - Interaction between different modal operators
-  - Extended framework for reasoning about time and possibility
+- **Description**: Includes modal and temporal operators
+- **Key Features**: Interaction between tense and circumstantial modality
 
 More information abut the bimodal theory can be found in [bimodal/README.md](bimodal/README.md).
 
@@ -157,7 +157,7 @@ from model_checker import get_theory
 from model_checker.theory_lib import get_examples
 
 # Load a theory
-theory = get_theory("default")  # or "exclusion", "imposition", "bimodal"
+theory = get_theory("logos")  # or "exclusion", "imposition", "bimodal"
 
 # Get examples from the theory
 examples = get_examples("default")
@@ -186,7 +186,7 @@ settings = {
 }
 
 # Build example with theory and settings
-model = BuildExample("example_name", get_theory("default"), settings=settings)
+model = BuildExample("example_name", get_theory("logos"), settings=settings)
 ```
 
 ### Comparing Theories
@@ -216,6 +216,33 @@ For questions or assistance, please open an [issue](https://github.com/benbrastm
 - **Enable verification**: Allow others to test logical arguments in your framework
 - **Receive feedback**: Get input from the community on your semantic approach
 - **Compare theories**: See how your theory handles examples compared to others
+
+## Licensing and Attribution
+
+All theories in the ModelChecker Theory Library are licensed under the GNU General Public License v3.0 (GPL-3.0). This ensures that:
+
+1. **Open Source Philosophy**: All theories remain freely available and modifiable
+2. **Copyleft Protection**: Any derivative works must also be licensed under GPL-3.0
+3. **Academic Attribution**: Academic credit is preserved through citation requirements
+
+### Theory Licensing Structure
+
+Each theory includes:
+
+- **LICENSE.md**: Contains the GPL-3.0 license text specific to the theory
+- **CITATION.md**: Contains proper academic citation information 
+- **Version Tracking**: Each theory has its own version, tracked in `__init__.py`
+
+### License Compliance for Theory Authors
+
+When contributing a theory:
+
+1. Your theory must be compatible with GPL-3.0 licensing
+2. You retain copyright for your theory implementation
+3. By contributing, you agree to license your theory under GPL-3.0
+4. Proper academic attribution will be maintained in CITATION.md
+
+This structure ensures that the ModelChecker ecosystem remains open while providing proper attribution to theory authors.
 
 ### Getting Started
 
@@ -579,6 +606,42 @@ class CustomModelStructure(ModelDefaults):
 These visualization methods will be automatically used by the Jupyter integration when displaying models.
 
 For comprehensive information about Jupyter notebook integration, including implementation details, APIs, and usage examples, see the [Jupyter Integration Documentation](../jupyter/README.md).
+
+## Testing
+
+The theory library includes comprehensive testing infrastructure to ensure reliability and correctness across all semantic theories.
+
+### Test Organization
+
+**Infrastructure Tests** ([tests/README.md](tests/README.md)):
+- Common functionality shared across theories
+- Metadata management (versioning, citations, licenses)
+- Theory discovery and loading mechanisms
+- Cross-theory compatibility and integration
+
+**Theory-Specific Tests**:
+- Individual theory implementations and their logical properties
+- See individual theory directories for detailed test documentation:
+  - [logos/tests/README.md](logos/tests/README.md) - Logos theory and subtheories
+  - [default/tests/README.md](default/tests/README.md) - Default semantic theory
+  - [exclusion/tests/README.md](exclusion/tests/README.md) - Exclusion semantics
+  - [imposition/tests/README.md](imposition/tests/README.md) - Imposition semantics
+  - [bimodal/tests/README.md](bimodal/tests/README.md) - Bimodal temporal logic
+
+### Running Tests
+
+```bash
+# Test theory library infrastructure
+python test_package.py --components theory_lib
+
+# Test specific theories
+python test_theories.py --theories logos exclusion imposition
+
+# Test everything
+python test_package.py && python test_theories.py
+```
+
+For detailed testing information, debugging guides, and development workflows, see [tests/README.md](tests/README.md).
 
 ## Best Practices
 

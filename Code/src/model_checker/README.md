@@ -57,12 +57,11 @@ The ModelChecker framework follows a modular architecture designed to separate c
    - Theory-specific adapters for consistent interfaces
    - See [Jupyter Integration Documentation](jupyter/README.md) for details
 
-### Theory Library
+### TheoryLib
 
-The `theory_lib` package contains specific implementations of logical theories:
+The `TheoryLib` contains programmatic semantic theories for fragment langages:
 
 1. **Theory Registry** (`theory_lib/__init__.py`)
-
    - Central registry of available theories
    - Lazy loading of theory implementations
    - Utilities for discovering and accessing theories
@@ -88,7 +87,7 @@ The typical API usage flow follows these steps:
 from model_checker import BuildExample, get_theory
 
 # 1. Load a theory
-theory = get_theory("default")
+theory = get_theory("logos")
 
 # 2. Create a model
 model = BuildExample("simple_modal", theory)
@@ -176,7 +175,7 @@ To add a new theory to the framework:
 ```python
 # In theory_lib/__init__.py
 AVAILABLE_THEORIES = [
-    'default',
+    'logos',
     'exclusion',
     'imposition',
     'your_new_theory',  # Add your theory here
